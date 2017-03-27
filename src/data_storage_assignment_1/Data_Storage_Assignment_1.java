@@ -41,8 +41,9 @@ public class Data_Storage_Assignment_1 {
         
         for (int i = 1 ; i <= runSize ; i++)
         {
-            String run_name = "runs/Run Number_";
+            String run_name = "runs/Run_Number_";
             run_name += i ;
+            run_name += ".bin" ;
             runs[i-1] = run_name;
             RandomAccessFile run = new RandomAccessFile(run_name, "rw");
             index_file.seek((i-1)*8*records_per_run);
@@ -51,23 +52,38 @@ public class Data_Storage_Assignment_1 {
         
         return runs ;  
     }
-    
+    static void Displayrun (String RunName) throws FileNotFoundException, IOException
+    {
+        RandomAccessFile res = new RandomAccessFile(RunName, "rw");
+            
+            for (int j = 0 ; j < res.length()/8 ; j++)
+            {
+                res.seek(j*8);
+                System.out.print("ID : " + res.readInt());
+                res.seek((j*8)+4);
+                System.out.println(" With offset: " + res.readInt());
+            }
+    }
     static String []  SortEachRunOnMemoryAndWriteItBack (String [] RunsFilesNames) throws FileNotFoundException, IOException
     {
         String[] sortedruns = new String[RunsFilesNames.length] ;
         
         for (int i = 0 ; i < RunsFilesNames.length ; i ++)
         {
+            //Start sorting The Runs one by one
             RandomAccessFile current_run = new RandomAccessFile(RunsFilesNames[i], "rw");
             int records[][];
             int keys[];
             int len = (int) current_run.length();
             records = new int[len/8][2];
             keys = new int[len/8];
-            System.out.println("Run Name = " + RunsFilesNames[i] + " and It's lenght is: " + len);
-            
+            System.out.println("\n Run Name = " + RunsFilesNames[i] + " and It's lenght is: " + len);
+            String run_name = "sorted_runs/Run_Number_";
+            run_name += i+1 ;
+            run_name += ".bin" ;
             for (int j = 0 ; j < len/8 ; j++)
             {
+                // Putting keys in The Keys array and Both Key and offsit in records array
                 current_run.seek(j*8);
                 //System.out.print("ID : " + current_run.readInt());
                 keys[j]= records[j][0] = current_run.readInt();
@@ -83,8 +99,9 @@ public class Data_Storage_Assignment_1 {
                 {
                     if(records[k][0]==keys[j])
                     {
-                        String run_name = "sorted_runs/Run Number_";
-                        run_name += i+1 ;
+                        // Map the sorted Keys array with the records array and write the result into
+                        // the run'sfile
+                        
                         RandomAccessFile sorted_run = new RandomAccessFile(run_name, "rw");
                         sortedruns [i] = run_name;
                         sorted_run.seek(sorted_run.length());
@@ -94,18 +111,49 @@ public class Data_Storage_Assignment_1 {
                     }
                 }
             }
-            
+            Displayrun(run_name);
         }
         
         
         return sortedruns;
     }
+     
+    static void DoKWayMergeAndWriteASortedFile(String [] SortedRunsNames, int K ,String Sortedfilename) throws FileNotFoundException, IOException
+    {
+        RandomAccessFile result = new RandomAccessFile(Sortedfilename, "rw");
+        
+        if (K == SortedRunsNames.length)
+        {
+            for (int i = 0 ; i < SortedRunsNames.length ; i +=2)
+            {
+                
+            
+            }
+        }
+        
+        
+        /*
+            RandomAccessFile res = new RandomAccessFile(result, "rw");
+            System.out.println("Result File Results: ");
+            for (int j = 0 ; j < 64 ; j++)
+            {
+                res.seek(j*8);
+                System.out.print("ID : " + res.readInt());
+                res.seek((j*8)+4);
+                System.out.println(" With offset: " + res.readInt());
+            }
+        */
+    }
+            
+            
+            
     public static void main(String[] args) throws FileNotFoundException, IOException {
         // TODO code application logic here
         System.out.print("Assignment #1 \n");
         
-        int num_of_runs = 1 ;
+        int num_of_runs ,num_of_ks = 1 ;
         String file_name = "Index.bin";
+        String Sortedfilename = "Sorted.bin";
         Scanner reader = new Scanner(System.in);
         String [] runs , sorted_runs ;
         
@@ -115,12 +163,14 @@ public class Data_Storage_Assignment_1 {
         for (int i = 0 ; i < runs.length ; i++) System.out.println(runs[i]);       
         sorted_runs = SortEachRunOnMemoryAndWriteItBack(runs);
         
+        System.out.print("\n Enter Number of Ks: ");
+        num_of_ks = reader.nextInt();
+        DoKWayMergeAndWriteASortedFile(sorted_runs,num_of_ks,Sortedfilename);
         
         System.out.println("Delete the runs? (1/0) ");
         if(reader.nextInt()== 1)
         {
             // Deleteing runs
-            // /*
             for (int i = 0 ; i < runs.length ; i++)
             {
                 File file1 = new File(runs[i]);
@@ -128,9 +178,7 @@ public class Data_Storage_Assignment_1 {
                 file1.delete();
                 file2.delete();
             }
-            // */
         }
-        
     }
     
 }
