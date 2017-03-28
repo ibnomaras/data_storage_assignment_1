@@ -141,12 +141,13 @@ public class Data_Storage_Assignment_1 {
             RandomAccessFile file_1 = new RandomAccessFile(to_be_merged[0], "rw");
             RandomAccessFile file_2 = new RandomAccessFile(to_be_merged[1], "rw");
             
-            file_1.seek(idx_1);
-            file_2.seek(idx_2);
-            id_1 = file_1.readInt();
+            file_1.seek(0);
+            file_2.seek(0);
+            id_1 = file_1.read();
             id_2 = file_2.readInt();
             while(flag == true)
             {
+                //System.out.println("Comparing: id_1= " + id_1 + " id_2 = " + id_2);
                 if (id_1 < id_2)
                 {  
                     temp_rn.writeInt(id_1);
@@ -156,11 +157,16 @@ public class Data_Storage_Assignment_1 {
                     temp_rn.writeInt(id_1);
                     if (idx_1 + 4 >= file_1.length())
                     {
-                        temp_rn.writeInt(id_2);
-                        idx_2 = idx_2 + 4;
-                        file_2.seek(idx_2);
-                        id_2 = file_2.readInt();
-                        temp_rn.writeInt(id_2);
+                        for (int f = idx_2 ; f < file_2.length() ; f= f + 8)
+                        {
+                            file_2.seek(f-4);
+                            id_1 = file_1.readInt();
+                            temp_rn.writeInt(id_1);
+                            file_2.seek(f+4);
+                            id_2 = file_2.readInt();
+                            temp_rn.writeInt(id_2);
+                        }
+                        
                         flag = false;
                     }
                     else
@@ -181,11 +187,16 @@ public class Data_Storage_Assignment_1 {
                     temp_rn.writeInt(id_2);
                     if (idx_2 + 4 >= file_2.length())
                     {
-                        temp_rn.writeInt(id_1);
-                        idx_1 = idx_1 + 4;
-                        file_1.seek(idx_1);
-                        id_1 = file_1.readInt();
-                        temp_rn.writeInt(id_1);
+                        for (int f = idx_1 ; f < file_1.length() ; f =f+8)
+                        {
+                            file_1.seek(f);
+                            id_1 = file_1.readInt();
+                            temp_rn.writeInt(id_1);
+                            file_1.seek(f+4);
+                            id_1 = file_1.readInt();
+                            temp_rn.writeInt(id_1);
+                        }
+                        
                         flag = false;
                     }
                     else
