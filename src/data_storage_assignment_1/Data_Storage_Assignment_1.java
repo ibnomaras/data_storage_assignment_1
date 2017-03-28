@@ -58,6 +58,7 @@ public class Data_Storage_Assignment_1 {
             
             for (int j = 0 ; j < res.length()/8 ; j++)
             {
+                System.out.print((j+1) + ")");
                 res.seek(j*8);
                 System.out.print("ID : " + res.readInt());
                 res.seek((j*8)+4);
@@ -77,7 +78,7 @@ public class Data_Storage_Assignment_1 {
             int len = (int) current_run.length();
             records = new int[len/8][2];
             keys = new int[len/8];
-            System.out.println("\n Run Name = " + RunsFilesNames[i] + " and It's lenght is: " + len);
+            System.out.println("\nRun Name = " + RunsFilesNames[i] + " and It's lenght is: " + len);
             String run_name = "sorted_runs/Run_Number_";
             run_name += i+1 ;
             run_name += ".bin" ;
@@ -117,18 +118,89 @@ public class Data_Storage_Assignment_1 {
         
         return sortedruns;
     }
-     
+    
+ 
     static void DoKWayMergeAndWriteASortedFile(String [] SortedRunsNames, int K ,String Sortedfilename) throws FileNotFoundException, IOException
     {
         RandomAccessFile result = new RandomAccessFile(Sortedfilename, "rw");
         
-        if (K == SortedRunsNames.length)
+        for (int i = 0 ; i < SortedRunsNames.length ; i += K)
         {
-            for (int i = 0 ; i < SortedRunsNames.length ; i +=2)
+            int id_1,id_2,idx_1 = 0,idx_2 = 0;
+            String temp_run = "temp_run_" + i;
+            RandomAccessFile temp_rn = new RandomAccessFile(temp_run, "rw");
+            String to_be_merged [] = new String[K];
+            boolean flag = true;
+            System.out.println("\nSort merging files: ");
+            for(int j = 0 ; j < K ; j ++)
             {
-                
-            
+                System.out.print( SortedRunsNames[i+j] +" ");
+                to_be_merged[j]=SortedRunsNames[i+j];
             }
+            
+            RandomAccessFile file_1 = new RandomAccessFile(to_be_merged[0], "rw");
+            RandomAccessFile file_2 = new RandomAccessFile(to_be_merged[1], "rw");
+            
+            file_1.seek(idx_1);
+            file_2.seek(idx_2);
+            id_1 = file_1.readInt();
+            id_2 = file_2.readInt();
+            while(flag == true)
+            {
+                if (id_1 < id_2)
+                {  
+                    temp_rn.writeInt(id_1);
+                    idx_1 = idx_1 + 4;
+                    file_1.seek(idx_1);
+                    id_1 = file_1.readInt();
+                    temp_rn.writeInt(id_1);
+                    if (idx_1 + 4 >= file_1.length())
+                    {
+                        temp_rn.writeInt(id_2);
+                        idx_2 = idx_2 + 4;
+                        file_2.seek(idx_2);
+                        id_2 = file_2.readInt();
+                        temp_rn.writeInt(id_2);
+                        flag = false;
+                    }
+                    else
+                    {
+                        idx_1 = idx_1 + 4;
+                        file_1.seek(idx_1);
+                        id_1 = file_1.readInt(); 
+                    }
+                    
+                }
+                
+                else
+                {
+                    temp_rn.writeInt(id_2);
+                    idx_2 = idx_2 + 4;
+                    file_2.seek(idx_2);
+                    id_2 = file_2.readInt();
+                    temp_rn.writeInt(id_2);
+                    if (idx_2 + 4 >= file_2.length())
+                    {
+                        temp_rn.writeInt(id_1);
+                        idx_1 = idx_1 + 4;
+                        file_1.seek(idx_1);
+                        id_1 = file_1.readInt();
+                        temp_rn.writeInt(id_1);
+                        flag = false;
+                    }
+                    else
+                    {
+                        idx_2 = idx_2 + 4;
+                        file_2.seek(idx_2);
+                        id_2 = file_2.readInt(); 
+                    }
+                    
+                }
+            }
+            
+            
+            System.out.println("\n");
+            Displayrun(temp_run);
         }
         
         
@@ -163,11 +235,11 @@ public class Data_Storage_Assignment_1 {
         for (int i = 0 ; i < runs.length ; i++) System.out.println(runs[i]);       
         sorted_runs = SortEachRunOnMemoryAndWriteItBack(runs);
         
-        System.out.print("\n Enter Number of Ks: ");
+        System.out.print("\nEnter Number of Ks: ");
         num_of_ks = reader.nextInt();
         DoKWayMergeAndWriteASortedFile(sorted_runs,num_of_ks,Sortedfilename);
         
-        System.out.println("Delete the runs? (1/0) ");
+        System.out.println("\nDelete the runs? (1/0) ");
         if(reader.nextInt()== 1)
         {
             // Deleteing runs
