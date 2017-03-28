@@ -217,13 +217,42 @@ public class Data_Storage_Assignment_1 {
         */
     }
             
+    
+    static void BinarySearchFor (RandomAccessFile index,int id, int start , int end) throws FileNotFoundException, IOException
+    {
+        
+        int mid = (start+end)/2, temp=0;
+        index.seek(mid-4);
+        temp = index.readInt();
+        System.out.println("Mid is: " + mid +" & Temp is "+ temp);
+        if (temp == id)
+        {
+            index.seek(mid);
+            System.out.println("ID: " + id + " Was found. And it's associtated Byteoffset is: " + index.readInt());
+        }
+        
+        else
+        {
             
+            if (mid > id)
+            {
+                BinarySearchFor (index,id, 0 , mid);
+            }
+
+            else if (mid < id)
+            {
+                BinarySearchFor (index,id, mid , end);
+            }
+        
+        }
+        
+    }
             
     public static void main(String[] args) throws FileNotFoundException, IOException {
         // TODO code application logic here
         System.out.print("Assignment #1 \n");
         
-        int num_of_runs ,num_of_ks = 1 ;
+        int num_of_runs ,num_of_ks = 1, search_id ;
         String file_name = "Index.bin";
         String Sortedfilename = "Sorted.bin";
         Scanner reader = new Scanner(System.in);
@@ -239,10 +268,18 @@ public class Data_Storage_Assignment_1 {
         num_of_ks = reader.nextInt();
         DoKWayMergeAndWriteASortedFile(sorted_runs,num_of_ks,Sortedfilename);
         
+        System.out.print("\nEnter ID to search for: ");
+        search_id = reader.nextInt();
+        RandomAccessFile sorted = new RandomAccessFile("temp_run_0", "rw");
+        //BinarySearchFor(sorted,search_id,0 , (int) sorted.length());
+        
+        
         System.out.println("\nDelete the runs? (1/0) ");
         if(reader.nextInt()== 1)
         {
             // Deleteing runs
+            File file = new File ("temp_run_0");
+            file.delete();
             for (int i = 0 ; i < runs.length ; i++)
             {
                 File file1 = new File(runs[i]);
