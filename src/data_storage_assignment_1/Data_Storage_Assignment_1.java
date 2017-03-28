@@ -233,12 +233,12 @@ public class Data_Storage_Assignment_1 {
     {
         
         int mid = (start+end)/2, temp=0;
-        index.seek(mid-4);
+        index.seek(mid);
         temp = index.readInt();
-        System.out.println("Mid is: " + mid +" & Temp is "+ temp);
+        System.out.println("Mid is: " + mid +" & Temp is "+ temp + " Start is: " + start + " End is: " + end);
         if (temp == id)
         {
-            index.seek(mid);
+            index.seek(mid+4);
             System.out.println("ID: " + id + " Was found. And it's associtated Byteoffset is: " + index.readInt());
         }
         
@@ -247,7 +247,7 @@ public class Data_Storage_Assignment_1 {
             
             if (mid > id)
             {
-                BinarySearchFor (index,id, 0 , mid);
+                BinarySearchFor (index,id, start , mid);
             }
 
             else if (mid < id)
@@ -282,7 +282,7 @@ public class Data_Storage_Assignment_1 {
         System.out.print("\nEnter ID to search for: ");
         search_id = reader.nextInt();
         RandomAccessFile sorted = new RandomAccessFile("temp_run_0", "rw");
-        //BinarySearchFor(sorted,search_id,0 , (int) sorted.length());
+        BinarySearchFor(sorted,search_id,0 , (int) sorted.length());
         
         
         System.out.println("\nDelete the runs? (1/0) ");
